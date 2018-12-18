@@ -83,7 +83,7 @@ function displayMatchedURLs(){
   searchurl(needleToDisplayMatchedURLs);
 }
 
-unction displayFromAPI(url){
+function displayFromAPI(url){
   var result = document.getElementById("displayFetchedUrls");
   var i = 0;
   var links = url["data"]["link_history"];
