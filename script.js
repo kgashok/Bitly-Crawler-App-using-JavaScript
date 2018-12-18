@@ -1,6 +1,8 @@
 // using AJAX call to fetch URL's from specified json file 
-
 function fetchurl(){
+  // start the timer... 
+  var performance = window.performance; // using performance interface to measure the precise time taken by this function
+  var start = performance.now();  // how to measure time taken by a function to execute -- https://www.wikitechy.com/tutorials/javascript/how-to-measure-time-taken-by-a-function-to-execute
   //document.getElementById('fetchurl').disabled = true;
   document.getElementById("displayFetchedUrls").innerHTML = "";
   var option1 = document.getElementById('radio1');
@@ -8,19 +10,22 @@ function fetchurl(){
   if (option1.checked == true)
     requestJSON = "links.json";
   else
-    requestJSON = "test-file.json";
-  var xmlhttp = new XMLHttpRequest();
+    //requestJSON = "test-file.json";
+    requestJSON = "https://api-ssl.bitly.com/v3/user/link_history?access_token=1ef1315a2efebd7557de137f776602276d833cb9&limit=100&offset=26100";
+  var xmlhttp = new XMLHttpRequest();                                        
   xmlhttp.onreadystatechange = function(){
     document.getElementById("requestStatus").innerHTML = "Request status code = " + this.status;
     if (this.readyState == 4 && this.status == 200){
       var result = JSON.parse(this.responseText); 
-      displayurl(result);
+      //displayurl(result);
+      displayFromAPI(result);
     }
   }
   xmlhttp.open("GET", requestJSON, true);
   xmlhttp.send();
+  var end = performance.now();  // stop the timer and display the time taken to fetch the URLs
+  document.getElementById('fetchTime').innerHTML = "Fetch time: ~" + Math.round(end - start) + "ms";  
 }
-
 function displayurl(url){
   var i;
   var fetchedurl;
@@ -37,31 +42,6 @@ function displayurl(url){
 }
 
 
-//https://www.w3schools.com/js/js_regexp.asp
-//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
-/*
-function searchurl(needleurl){
-  var i = 0;
-  var hayurl = document.getElementById("block" + i).innerHTML;
-  while (hayurl){
-    if (needleurl == ""){
-      document.getElementById("block" + i).style.backgroundColor = "white";
-      document.getElementById("block" + i).style.fontSize = "20px";
-    }
-    else if (hayurl.toLowerCase().includes(needleurl.toLowerCase())){
-      document.getElementById("block" + i).style.backgroundColor = "violet";      
-      document.getElementById("block" + i).style.fontSize = "25px";
-    }
-    else{
-      document.getElementById("block" + i).style.backgroundColor = "white";             
-      document.getElementById("block" + i).style.fontSize = "20px";
-    }
-    i++;
-    hayurl = document.getElementById("block" + i).innerHTML;
-  }
-}
-*/
-
 var needleToDisplayMatchedURLs = null;
 var toggleButton = document.getElementById("toggleMatchedAll");
 
@@ -75,21 +55,18 @@ function searchurl(needleurl){
         document.getElementById("block" + i).style.display = "block";        
       else
         document.getElementById("block" + i).style.display = "none";                
-      document.getElementById("block" + i).style.backgroundColor = "white";
-      document.getElementById("block" + i).style.fontSize = "20px";
+      document.getElementById("block" + i).classList.remove("displayMatchedURLs");
     }
     else if (hayurl.toLowerCase().includes(needleurl.toLowerCase())){
       document.getElementById("block" + i).style.display = "block";        
-      document.getElementById("block" + i).style.backgroundColor = "violet";      
-      document.getElementById("block" + i).style.fontSize = "25px";
+      document.getElementById("block" + i).classList.add("displayMatchedURLs");
     }
     else{
       if (toggleButton.value == "Matched Only")
         document.getElementById("block" + i).style.display = "block";        
       else
         document.getElementById("block" + i).style.display = "none";                
-      document.getElementById("block" + i).style.backgroundColor = "white";             
-      document.getElementById("block" + i).style.fontSize = "20px";
+      document.getElementById("block" + i).classList.remove("displayMatchedURLs");
     }
     i++;
     hayurl = document.getElementById("block" + i).innerHTML;
@@ -103,4 +80,17 @@ function displayMatchedURLs(){
   else
     toggleButton.value = "Matched Only";
   searchurl(needleToDisplayMatchedURLs);
+}
+
+function displayFromAPI(url){
+  var result = document.getElementById("displayFetchedUrls");
+  var i = 0;
+  var links = url["data"]["link_history"];
+  var displayURL = "<br>";
+  for (; i < links.length; i++){
+    if (links[i]["keyword_link"] !== undefined)
+      displayURL += links[i]["keyword_link"] + "<br>";
+    displayURL += links[i]["long_url"] + "<br>" + "<br>";
+  }
+  result.innerHTML = displayURL + "<br>" + "<br>" + i;
 }
