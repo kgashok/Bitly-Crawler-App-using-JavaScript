@@ -11,7 +11,8 @@ function fetchurl(){
     requestJSON = "links.json";
   else
     //requestJSON = "test-file.json";
-    requestJSON = "https://api-ssl.bitly.com/v3/user/link_history?access_token=1ef1315a2efebd7557de137f776602276d833cb9&limit=100&offset=26100";
+    //requestJSON = "https://api-ssl.bitly.com/v3/user/link_history?access_token=1ef1315a2efebd7557de137f776602276d833cb9&limit=100&offset=26100";
+    requestJSON = "https://api-ssl.bitly.com/v3/user/link_history?access_token=1ef1315a2efebd7557de137f776602276d833cb9&limit=100";
   var xmlhttp = new XMLHttpRequest();                                        
   xmlhttp.onreadystatechange = function(){
     document.getElementById("requestStatus").innerHTML = "Request status code = " + this.status;
@@ -82,15 +83,20 @@ function displayMatchedURLs(){
   searchurl(needleToDisplayMatchedURLs);
 }
 
-function displayFromAPI(url){
+unction displayFromAPI(url){
   var result = document.getElementById("displayFetchedUrls");
   var i = 0;
   var links = url["data"]["link_history"];
-  var displayURL = "<br>";
   for (; i < links.length; i++){
-    if (links[i]["keyword_link"] !== undefined)
+    if (links[i]["keyword_link"] !== undefined) {
+      var displayURL = "<br>";
+      var urldiv = document.createElement('div');
+      urldiv.id="block" + i;
       displayURL += links[i]["keyword_link"] + "<br>";
-    displayURL += links[i]["long_url"] + "<br>" + "<br>";
+      displayURL += links[i]["long_url"] + "<br>" + "<br>";
+      urldiv.innerHTML = displayURL;
+      //result.innerHTML = urldiv + "<br>" + "<br>" + i;
+      result.appendChild(urldiv); // + "<br>" + "<br>" + i;
+    }
   }
-  result.innerHTML = displayURL + "<br>" + "<br>" + i;
 }
